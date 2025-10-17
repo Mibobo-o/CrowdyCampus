@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>캠퍼스 혼잡도 예측 지도</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <style>
+    body{margin:0;font-family:system-ui,AppleSDGothicNeo,"Segoe UI",sans-serif}
+    header{padding:10px 12px;border-bottom:1px solid #eee}
+    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    #map{height:calc(100vh - 62px)}
+    button{padding:8px 12px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer}
+    input{padding:6px 8px;border:1px solid #ddd;border-radius:8px}
+  </style>
+<style>
+    /* 범례 스타일 */
+    .legend {
+      background: white; padding: 8px 10px; line-height: 1.4;
+      border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.1);
+      font-size: 13px;
+    }
+    .legend i {
+      width: 12px; height: 12px; display: inline-block; margin-right: 6px; border-radius: 2px;
+    }
+  </style>
+
+
+</head>
+<body>
+  <header class="controls">
+    <strong>캠퍼스 혼잡도 예측 지도</strong>
+    <span>| 시각 선택:</span>
+    <input type="datetime-local" id="when" />
+    <button id="apply">예측 반영</button>
+    <span id="status" aria-live="polite"></span>
+  </header>
+
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    // ⚠️ 로컬 개발 시
+    // 백엔드가 로컬에서 돌고 있으면 아래를 사용
+    // 배포(Render 등) 후엔 https URL로 교체하세요.
+    // 예: const API = "https://your-app.onrender.com";
+    const API = "http://127.0.0.1:8000";
+
+    // 기본 지도 생성 (학교 중심좌표로 바꿔도 됨)
+    const map = L.map('map').setView([37.5665, 126.9780], 16);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+
+    let markers = [];
+
+    function colorByRatio(r){           // r: 0~1
+    if (r < 0.30) return "#2ecc71";   // 초록
+    if (r < 0.60) return "#f1c40f";   // 노랑
+    if (r < 0.80) return "#e67e22";   // 주황
+    return "#e74c3c";                 // 빨강
+  }
+  // 혼잡도 비례 마커 반경 (모바일/데스크탑 모두 보기 좋은 스케일)
+  function radiusByRatio(r){          // r: 0~1
+    const min = 6, max = 18;          // 필요시 조절
+    return Math.round(min + (max - min) * Math.min(Math.max(r, 0), 1));
+  }
+
+  // 지도 생성 직후에 범례 컨트롤 추가
+  const legend = L.control({ position: "bottomright" });
+  legend.onAdd = function(){
+    const div = L.DomUtil.create("div", "legend");
+    div.innerHTML = `
+      <div><strong>색상 범례</strong></div>
+      <div><i style="background:#2ecc71"></i>&lt;30% (여유)</div>
+      <div><i style="background:#f1c40f"></i>&lt;60% (보통)</div>
+      <div><i style="background:#e67e22"></i>&lt;80% (주황)</div>
+      <div><i style="background:#e74c3c"></i>&ge;80% (혼잡)</div>
+    `;
+    return div;
+  };
+  legend.addTo(map);
+
+    async function getJSON(url){
+      const res = await fetch(url);
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    async function loadLocations(){
+      return getJSON(`${API}/locations`);
+    }
+
+    async function predict(atISO, location_id){
+      const url = `${API}/predict?at=${encodeURIComponent(atISO)}&location_id=${encodeURIComponent(location_id)}`;
+      return getJSON(url);
+    }
+
+    function clearMarkers(){
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+    }
+
+    async function render(at){
+      const status = document.getElementById('status');
+      try{
+        status.textContent = "로딩 중…";
+        clearMarkers();
+        const atISO = toIsoSeconds(at);
+        const locs = await loadLocations();
+
+        for(const loc of locs){
+          const p = await predict(atISO, loc.location_id);
+          const ratio = p.congestion_ratio ?? 0;
+          const m = L.circleMarker([loc.lat, loc.lng], {
+  radius: radiusByRatio(ratio),
+  color: colorByRatio(ratio),
+  weight: 2,
+  fillOpacity: 0.7
+}).addTo(map);
+
+          m.bindPopup(
+            `<b>${loc.name}</b><br/>예측: ${p.predicted_count} / ${p.capacity}<br/>혼잡도: ${(ratio*100).toFixed(0)}%<br/><small>${p.timestamp}</small>`
+          );
+          markers.push(m);
+        }
+        status.textContent = "완료";
+      }catch(e){
+        console.error(e);
+        status.textContent = "에러: " + e.message;
+        alert("데이터 로딩 중 오류가 발생했습니다.\n개발자 콘솔(F12)을 확인하세요.");
+      }
+    }
+
+    function toIsoSeconds(dt){
+      // datetime-local 입력값 또는 Date → 'YYYY-MM-DDTHH:MM:SS'
+      const d = (dt instanceof Date) ? dt : new Date(dt);
+      const iso = new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString();
+      return iso.slice(0,19); // 초까지
+    }
+
+    // 초기값: 현재 시각
+    const whenInput = document.getElementById('when');
+    const nowLocal = new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
+    whenInput.value = nowLocal;
+
+    document.getElementById('apply').addEventListener('click', () => {
+      const val = whenInput.value || nowLocal;
+      render(val);
+    });
+
+    // 첫 렌더
+    render(whenInput.value);
+  </script>
+</body>
+</html>
