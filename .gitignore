@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 .vscode/
 data/
+!backend/data/demo_observations.csv
+!backend/data/locations_master.csv
+!backend/data/make_demo.py
