@@ -30,6 +30,8 @@ def get_locations():
 
 @app.get("/predict")
 def predict(at: str, location_id: str):
+
+    
     ts = pd.to_datetime(at)
     key = (location_id, int(ts.dayofweek), int(ts.hour))
     yhat = int(AVG.get(key, 0))

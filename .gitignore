@@ -2,7 +2,12 @@
 __pycache__/
 *.pyc
 .vscode/
-data/
+# .gitignore 파일의 맨 아래나 data 관련 규칙 위치에 추가
+
+# 1. backend/data/ 폴더 안의 모든 것을 일단 무시
+backend/data/*
+
+# 2. 하지만 이 두 파일은 예외로 함 (무시하지 않음)
 !backend/data/demo_observations.csv
 !backend/data/locations_master.csv
 !backend/data/make_demo.py
