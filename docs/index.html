@@ -49,7 +49,8 @@
     // 백엔드가 로컬에서 돌고 있으면 아래를 사용
     // 배포(Render 등) 후엔 https URL로 교체하세요.
     // 예: const API = "https://your-app.onrender.com";
-    const API = "http://127.0.0.1:8000";
+    const url = "https://crowdycampus.onrender.com/api/locations";
+    fetch(url)
 
     // 기본 지도 생성 (학교 중심좌표로 바꿔도 됨)
     const map = L.map('map').setView([37.5665, 126.9780], 16);
