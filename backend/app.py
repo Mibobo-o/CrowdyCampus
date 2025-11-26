@@ -9,6 +9,8 @@ origins = [
     "https://mibobo-o.github.io",  # 1순위: 깃허브 페이지 주소
     "http://127.0.0.1:5500",    # 2순위: 로컬 테스트용 주소 (VS Code Live Server 등)
     "http://localhost:8000",   # 3순위: (혹시 모를) 로컬 테스트용
+    "http://localhost:8001",
+    "http://127.0.0.1:8001",
 ]
 # 3. CORS 미들웨어 추가
 app.add_middleware(

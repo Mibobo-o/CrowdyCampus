@@ -1,6 +1,17 @@
 location_id,name,category,lat,lng,capacity
-L001,Main Library,reading_room,35.17,129.0480,800
-L002,Cafeteria A,cafeteria,35.1667,129.9782,300
-L003,Engineering Bldg 302,lecture,35.1668,129.0777,120
-L004,Study Zone B,reading_room,35.1662,129.0784,90
-L005,Gym Entrance,other,35.1661,129.0785,200
+L001,Main Library,reading_room,35.142416, 129.034798,800
+L002,Cafeteria A,cafeteria,35.142416, 129.034798,750
+L003,Engineering Bldg,lecture,35.144272, 129.036288,600
+L004,Study Zone B,reading_room,35.142272, 129.034824 ,500
+L005,Gym Entrance,lecture,35.140039, 129.034349,200
+L006,Student Center,lecture,35.139607, 129.033357,550
+L007,Music hall,other,35.142052, 129.032927,600
+L008,Residence hall A, other,35.141671, 129.033512,300
+L009,Hyеanji,other,35.140970, 129.033472,90
+L010,Residence hall B,lecture,35.142988, 129.032731,350
+L011,Jicheon Hall,lecture,35.144256, 129.034980,400
+L012,Information Engineering Building,lecture,35.145668, 129.036540,200
+L013,Creativity Building,lecture,35.143747, 129.035283,200
+L014,Cafeteria B,cafeteria,35.145668, 129.036540,200
+L015,International Building,lecture,35.140957, 129.032381,200
+
