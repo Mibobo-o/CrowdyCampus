@@ -1,6 +1,6 @@
 location_id,name,category,lat,lng,capacity
-L001,Main Library,reading_room,37.5665,126.9780,800
-L002,Cafeteria A,cafeteria,37.5667,126.9782,300
-L003,Engineering Bldg 302,lecture,37.5668,126.9777,120
-L004,Study Zone B,reading_room,37.5662,126.9784,90
-L005,Gym Entrance,other,37.5661,126.9785,200
+L001,Main Library,reading_room,35.17,129.0480,800
+L002,Cafeteria A,cafeteria,35.1667,129.9782,300
+L003,Engineering Bldg 302,lecture,35.1668,129.0777,120
+L004,Study Zone B,reading_room,35.1662,129.0784,90
+L005,Gym Entrance,other,35.1661,129.0785,200
