@@ -28,11 +28,21 @@
     }
   </style>
 
+<!-- TEST MARKER -->
 
 </head>
 <body>
   <header class="controls">
+  
     <strong>캠퍼스 혼잡도 예측 지도</strong>
+
+    <button id="btn-now">지금 혼잡도 보기</button>
+    <span id="now-info"></span>
+    
+    <button id="btn-play">▶ 자동재생</button>
+    <button id="btn-stop">⏹ 정지</button>
+    <span id="play-info"></span>
+    
     <span>| 시각 선택:</span>
     <input type="datetime-local" id="when" />
     <button id="apply">예측 반영</button>
@@ -52,7 +62,7 @@
      const API = "https://crowdycampus.onrender.com";
 
     // 기본 지도 생성 (학교 중심좌표로 바꿔도 됨)
-    const map = L.map('map').setView([37.5665, 126.9780], 16);
+    const map = L.map('map').setView([ 35.1443, 129.0363], 16);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
 
@@ -155,6 +165,40 @@
 
     // 첫 렌더
     render(whenInput.value);
+
+    document.getElementById("btn-now").addEventListener("click", async () => {
+      const at = new Date();
+      const iso = toIsoSeconds(at);
+
+      document.getElementById("now-info").textContent = `(기준 시각: ${iso})`;
+
+      await render(iso);
+    });
+
+     let playTimer = null;
+    let playHour = 9;
+
+    async function playStep() {
+      const now = new Date();
+      now.setHours(playHour, 0, 0);
+      const iso = toIsoSeconds(now);
+
+      document.getElementById("play-info").textContent = `${playHour}:00`;
+
+      await render(iso);
+
+      playHour++;
+      if (playHour > 18) playHour = 9;
+    }
+
+    document.getElementById("btn-play").addEventListener("click", () => {
+      if (!playTimer) playTimer = setInterval(playStep, 1000);
+    });
+
+    document.getElementById("btn-stop").addEventListener("click", () => {
+      clearInterval(playTimer);
+      playTimer = null;
+    });
   </script>
 </body>
 </html>
