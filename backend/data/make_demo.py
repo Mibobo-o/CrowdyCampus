@@ -24,11 +24,11 @@ for _, r in locs.iterrows():
     if r["category"] == "cafeteria":
         base += ( (hours>=11) & (hours<=13) ) * rng.integers(120, 260, len(idx))
     elif r["category"] == "reading_room":
-        base += ( (hours>=18) & (hours<=21) ) * rng.integers(40, 120, len(idx))
+        base += ( (hours>=18) & (hours<=21) ) * rng.integers(40, 420, len(idx))
     elif r["category"] == "lecture":
-        base += ( (hours>=9) & (hours<=17) ) * rng.integers(10, 60, len(idx))
+        base += ( (hours>=9) & (hours<=17) ) * rng.integers(70, 400, len(idx))
     else:
-        base += rng.integers(0, 20, len(idx))
+        base += rng.integers(31, 500, len(idx))
 
     # 노이즈 + 수용인원 클리핑
     base = base + rng.integers(0, 15, len(idx))
