@@ -2,7 +2,7 @@
 실시간 혼잡도 기반 캠퍼스 내 시설 이용 지원 서비스
 
 🔗 **프로젝트 데모 사이트:** https://mibobo-o.github.io/CrowdyCampus/  
-🔗 **API 엔드포인트:** https://crowdycampus.onrender.com/
+🔗 **API 엔드포인트:** https://crowdycampus.onrender.com/  
 🔗 **Google Slide 발표자료:** https://docs.google.com/presentation/d/1kT-0Ihq9DpSrSw0aV0GT2U61dc3JaqWFjK08vxS59_8/edit?slide=id.p1#slide=id.p1
 ---
 
